@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>epics</title>
+
+    <script type="text/javascript" src="/apps/2.0rc1/sdk.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/async/1.22/async.min.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function () {
+                Ext.define('CustomApp', {
+    extend: 'Rally.app.App',
+    componentCls: 'app',
+
+    launch: function() {
+        //Write app code here
+        Ext.state.Manager.setProvider(
+            new Ext.state.CookieProvider({ expires: new Date(new Date().getTime()+(10006060247)) })
+        );
+
+        app = this;
+        var that = this;
+        console.log("launch");
+        // get the project id.
+        this.project = this.getContext().getProject().ObjectID;
+
+        var configs = [];
+        configs.push({model: "PortfolioItem/Feature",
+        			  fetch: ['UserStories'],
+        			  filters: []
+    	});
+    	async.map( configs, this.wsapiQuery, function(err,results) {
+    		that.records = results[0];
+    		totalRecords = [];
+    		for(var i=0;i<that.records.length;i++)
+    			totalRecords[i]=that.records[i].data.UserStories._ref;
+    		console.log("Done ",totalRecords);
+    		ref = totalRecords[0];
+    		
+    	});
+    },
+    wsapiQuery : function( config , callback ) {
+        Ext.create('Rally.data.WsapiDataStore', {
+            autoLoad : true,
+            limit : "Infinity",
+            model : config.model,
+            fetch : config.fetch,
+            filters : config.filters,
+            listeners : {
+                scope : this,
+                load : function(store, data) {
+                    callback(null,data);
+                }
+            }
+        });
+    }
+});
+
+
+            Rally.launchApp('CustomApp', {
+                name:"epics",
+	            parentRepos:""
+            });
+
+        });
+    </script>
+
+
+    <style type="text/css">
+        .app {
+     /* Add app styles here */
+}
+
+    </style>
+</head>
+<body></body>
+</html>
