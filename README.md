@@ -3,6 +3,7 @@ epics
 
 ## Overview
 
+A Waited Shortest Job First algorithm on Epics.
 
 ## License
 
